@@ -1,0 +1,81 @@
+
+/* sthn pragmatikothta oi synarthseis sto montior einai 4.. 2 symmetrikes gia kathe pleyra*/
+
+monitor {
+
+  void enter() {
+    while(crossingOS || crossingS == N || limitS == N) {
+        blockedS++;
+        wait(queueS);
+        blockedS --;
+    }
+
+    crossingS++;
+    limitS++;
+
+    if ( (blockedS > 0) && (crossings < N) && ( limitS < N ) ) {
+        signal(queueS);
+    }
+  }
+
+
+
+  void leave() {
+
+    crossingS--;
+    if ( crossingS == 0 ) {
+
+        if ( blockedOS > 0 ) {
+            limitOS = 0;
+            signal(queueOS);
+        }
+        else if ( blocked > 0 ) {
+            limitS = 0;
+            signal(queueS);
+        }
+    }
+  }
+
+}
+
+
+Ekshghseis:
+
+Limit:  Gia thn apofygh provlimatwn loimoktonias h metavliti limit paristanei
+        to megisto plithos twn amaksiwn pou mporoun na perasoun synexomena
+        apo mia lwrida thn gefyra
+
+
+
+void enter: kathe neo amaksi pou exei prothesi na perasei arxika:
+                1) mpainei se oura anamonhs an yparxoyn amaksia apo thn allh lwrida
+                   panw sthn gefyra.
+
+                2) mpainei se oura anamonhs an h gefyra exei gemisei apo thn
+                   lwrida tou, h ta amaksia exoun ftasei to orio limit.
+
+                Apo thn stigmh poy mpei sthn gefyra ksemplokarei to poly 'limit'
+                amaksia apo thn lwrida tou (an yparxoyn)
+
+
+void exit:  otan to TELEYTAIO amaksi apo mia lwrida vgei apo thn gefyra tote
+                1) arxika elegxei thn apenanti lwrida wste na dwsei proteraiothta
+                   ama yparxoun mplokarismena aytikinhta
+                2) an den... tote kanei to idio gia thn dikia tou lwrida
+
+
+
+Texnikes leptomeries:
+
+        1) parathroume oti h entolh signal tha einai panta h teleytaia entolh
+           enos thread.. (den yparxei diafora metaksy signal&block,signal&cont)
+
+        2) sthn arxh ths void enter exoume while anti gia if gia na glytwsoume
+           problhmata pou prokyptoun ama exoume montelo open.
+
+           Ama eixame if anti gia while:
+
+           Sto montelo open ama ena amaksi ksemplokaristei yparxei endexomena na
+           prosperasei apo polla alla, h gefyra telika na ksanagemisei,
+           kai telika to amaksi pou ksemplokaristike na mpei enw h gefyra einai
+           gemath.
