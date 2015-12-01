@@ -1,0 +1,114 @@
+/* o parakaw kwdikas  perilamvanei thn diothwsh sthn parathrhsh 2) kai 3) */
+
+monitor {
+
+    /* passenger function*/
+    void takeride() {
+        while(1)  {
+            while (train_avl == FALSE) {blocked++; wait(queue); blocked--;}
+
+            count++;
+
+            if (count == N+1) {
+                train_avl = FALSE;
+                if (train_waits) {
+                    signal(aboard);
+                }
+            }
+            else {
+                break;
+            }
+        }
+
+
+        wait(trip);
+    }
+
+
+
+    /* train function*/
+    void all_in() {
+        if (count <= N) {train_waits = 1; wait(aboard);}
+        count = 0; train_waits = 0;
+    }
+
+
+
+    /* train function*/
+    void all_down_and_return() {
+
+        for (i=0; i<N; i++) {
+            signal(trip);
+        }
+
+        train_avl = TRUE;
+
+        i = 0;
+
+        // we could have signal_all here. some passengers might block again
+        // thanks to takeride's while
+        while (i<N && blocked > 0) {
+            signal(queue);
+            i++;
+        }
+    }
+
+
+}
+
+
+Ekshghseis:
+
+ypopsin:    Arxika thewtoume oti to treno einai hdh ekei kai perimenei tous epivates.
+
+train_avl:  flag gia to an to treno einai diathesimo na dextei neous epivates
+
+takeride:   Kathe epivaths arxika elegxei ama to treno einai diathesimo.
+            An nai, tote ayksanei ton metrith thesewn, kai mpainei se oura anamonhs
+            gia to taksidi (wait(queue)). Des 3) gia perissotera
+
+all_in:     to treno tha perimenei mexri na eidopoihthei gia na ksekinhsei to taksidi
+
+all_down_and_arrival:
+            To treno ftanei sto telos tou proorismou tou kai adeiazei thn oura
+            anamonhs gia to taksidi. einai sigouro oti einai akrivws N
+            mplokarismenoi epivates sto trip? (des to 3) )
+            Telika epistrefei kai dinei shma stous epivates na mpoun.
+            (ksemplokarei to poly N)
+
+
+Kapoies leptomeries:
+
+    1) sthn synarthsh takeride exoume while gia na glytwsoume apo provlima enos
+       OPEN monitor.
+
+    2) ( parathrhsh gia kwdika xwris to train_waits )
+       Yparxei periptwsh na klithei askopa h signal(aboard) otan exoun mpei oloi
+       oi epivates sto treno to opoio den exei tyxei na kalesei thn all_in()
+
+       LYSH: prothiki metavlitis flag pou dhlwnei oti treno perimenei.
+
+
+    3) ( parathrhsh gia kwdika xwris to while thn takeride )
+       Mia leptomeria sto condition aboard..
+       Doulevei swsta to programma meta thn klhsh singal(aboard) gia oles tis
+       periptwseis monitor? (eggshell|open)(sig.block|sig.cont)
+       Den theloume na klhsei h all_down_and_return protou ginei to teleytaio wait(trip)
+
+       sto sig.cont genika den yparxei thema mias kai h synarthsh synexizei kai kalei
+       to wait(trip)
+
+       sto eggshell genika den yparxei thema kathws oi logiki panw katw einai fifo..
+       prohgountai oi ayta pou einai mesa sto egg
+
+       PROVLIMA PROVLIMA!!!!!!!!!!!!!
+       Provlima sto OPEN kai SIG.BLOCK mono.
+       h synexish ths takeride mporei na prosperastei apo thn all_down_and_arrival
+
+       LYSH!!!!!
+       Ama o N+1 epivaths ksipnouse to treno?? kai meta epanektelouse thn synarthsh tou?
+       arkei ena loop pou eketleitai mono mia fora ston N+1 epivath
+       .. while pou tha kanei mono 1 loop mono otan count = N + 1
+
+       prosthiki <= anti gia < sto all_in.. to treno twra den koitaei na gemisei
+       alla perimenei eidopoihsh apo ton N+1 epivath
